@@ -4,45 +4,33 @@ var onRun = function(context) {
     var imageData = NSData.dataWithContentsOfURL(imageFilePath)
     var image = NSImage.alloc().initWithData(imageData)
 
-	updateLayers(context, image)
-	updateArtboards(context, image)
+	changeLayers(context, image)
+	changeArtboards(context, image)
 };
 
 
-function updateLayers(context, image) {
+function changeLayers(context, image) {
 	var doc = context.document
     var layers = doc.currentPage().layers()
-	update(layers, image)
+	change(layers, image)
 }
 
-function updateArtboards(context, image) {
+function changeArtboards(context, image) {
 	var doc = context.document
 	var artboards = doc.artboards()
 	for(var i = 0; i < artboards.length; i++){
 		var artboard = artboards[i]
 		var layers = artboard.layers()
-		update(layers, image)
+		change(layers, image)
 	}
 }
 
-function updateSymbols(symbols, image) {
-	for(var i = 0; i < symbols.length; i++){
-		var symbol = symbols[i];
-		var symbolInstances = symbol.allInstances()
-		for(var j = 0; j < symbolInstances.length; j++){
-			var symbolInstance = symbolInstances[j]
-			var layer = symbolInstance.detachByReplacingWithGroup()
-			update(layer.layers(), image)
-		}
-	}
-}
-
-function updateSymbolInstance(symbolInstance, image) {
+function changeSymbolInstance(symbolInstance, image) {
 	var layer = symbolInstance.detachByReplacingWithGroup()
-	update(layer.layers(), image)
+	change(layer.layers(), image)
 }
 
-function update(layers, image) {
+function change(layers, image) {
 	for(var i = 0; i < layers.length; i++){
 		var layer = layers[i];
 		layer.setName("🈲")
@@ -56,9 +44,9 @@ function update(layers, image) {
 		} else if (layer.class() == MSTextLayer) {
 			layer.stringValue = "🈲"
 		} else if (isGroup(layer)) {
-			update(layer.layers(), image)
+			change(layer.layers(), image)
 		} else if (isSymbol(layer)) {
-			updateSymbolInstance(layer, image)
+			changeSymbolInstance(layer, image)
 		}
 	}
 }
@@ -70,3 +58,4 @@ var isGroup = function(layer){
 var isSymbol = function(layer){
     return layer.isMemberOfClass(MSSymbolInstance.class())
 };
+
