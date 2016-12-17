@@ -1,0 +1,92 @@
+var onRun = function(context) {
+    var plugin = context.plugin
+    var imageFilePath = plugin.urlForResourceNamed("kin.png")
+    var imageData = [NSData dataWithContentsOfURL:imageFilePath]
+    var image = NSImage.alloc().initWithData(imageData)
+
+	updateLayers(context, image)
+	updateArtboards(context, image)
+};
+
+
+function updateLayers(context, image) {
+	var doc = context.document
+    var layers = [[doc currentPage] layers]
+	update(layers, image)
+}
+
+function updateArtboards(context, image) {
+	var doc = context.document
+	var artboards = doc.artboards()
+	for(var i = 0; i < artboards.length; i++){
+		var artboard = artboards[i]
+		var layers = artboard.layers()
+		update(layers, image)
+	}
+}
+
+function updateSymbols(symbols, image) {
+	for(var i = 0; i < symbols.length; i++){
+		var symbol = symbols[i];
+		var symbolInstances = symbol.allInstances()
+		for(var j = 0; j < symbolInstances.length; j++){
+			var symbolInstance = symbolInstances[j]
+			var layer = symbolInstance.detachByReplacingWithGroup()
+			update(layer.layers(), image)
+		}
+	}
+}
+
+function updateSymbolInstance(symbolInstance, image) {
+	var layer = symbolInstance.detachByReplacingWithGroup()
+	update(layer.layers(), image)
+}
+
+function update(layers, image) {
+	for(var i = 0; i < layers.length; i++){
+		var layer = layers[i];
+		layer.setName("🈲")
+		if([layer class] == MSShapeGroup){
+		    var fill = layer.style().fills().firstObject();
+		    if (fill != nil) {
+				fill.setFillType(4);
+				fill.setImage(MSImageData.alloc().initWithImage_convertColorSpace(image, false));
+				fill.setPatternFillType(3);
+			}
+		} else if ([layer class] == MSTextLayer) {
+			layer.stringValue = "🈲"
+		} else if (isGroup(layer)) {
+			update(layer.layers(), image)
+		} else if (isSymbol(layer)) {
+			updateSymbolInstance(layer, image)
+		}
+	}
+}
+
+var isGroup = function(layer){
+    return [layer isMemberOfClass:[MSLayerGroup class]]
+};
+
+var isSymbol = function(layer){
+    return [layer isMemberOfClass:[MSSymbolInstance class]]
+};
+
+// Debug
+function updateSymbolToKinImage(context) {
+    var plugin = context.plugin
+    var imageFilePath = plugin.urlForResourceNamed("Confidential.png")
+    var imageData = [NSData dataWithContentsOfURL:imageFilePath]
+    var image = NSImage.alloc().initWithData(imageData)
+
+	var doc = context.document
+    var symbols = doc.documentData().allSymbols()
+	updateSymbols(symbols, image)
+}
+
+function runModal(str) {
+	var alert = NSAlert.alloc().init()
+    alert.setMessageText(str)
+    alert.addButtonWithTitle("OK")
+    
+    alert.runModal()
+}
