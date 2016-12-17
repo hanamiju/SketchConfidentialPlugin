@@ -2,10 +2,12 @@
 
 This is a joke sketch plugin.
 
-「🈲」version
+## 「🈲」version
+
 ![image1](https://raw.githubusercontent.com/hanamiju/SketchConfidentialPlugin/master/example/image.gif "image1")
 
-「Confidential」version
+## 「Confidential」version
+
 ![image2](https://raw.githubusercontent.com/hanamiju/SketchConfidentialPlugin/master/example/image2.gif "image2")
 
 
